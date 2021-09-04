@@ -27,4 +27,10 @@ public class DataHelper {
   public static VerificationCode getVerificationCodeFor(AuthInfo authInfo) {
     return new VerificationCode("12345");
   }
+
+  public static String cardFullname(String card) { //для ввода волного номера карты
+    if (card.equals("0001")) return "5559 0000 0000 0001";
+    if (card.equals("0002")) return "5559 0000 0000 0002";
+    return null;
+  }
 }

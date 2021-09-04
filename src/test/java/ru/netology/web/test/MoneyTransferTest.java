@@ -4,25 +4,39 @@ import org.junit.jupiter.api.Test;
 import ru.netology.web.data.DataHelper;
 import ru.netology.web.page.DashboardPage;
 import ru.netology.web.page.LoginPageV1;
-import ru.netology.web.page.LoginPageV2;
-import ru.netology.web.page.LoginPageV3;
+import ru.netology.web.page.TransferPage;
 
 import static com.codeborne.selenide.Selenide.open;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class MoneyTransferTest {
+    String cardTo = "0001";
+    String cardFrom = "0002";
     @Test
-    void shouldTransferMoneyBetweenOwnCardsV1() {
+    void shouldTransferMoneyBetweenOwnCards() {
         open("http://localhost:9999");
         var loginPage = new LoginPageV1();
         var authInfo = DataHelper.getAuthInfo();
         var verificationPage = loginPage.validLogin(authInfo);
         var verificationCode = DataHelper.getVerificationCodeFor(authInfo);
         verificationPage.validVerify(verificationCode);
+
         var dashboardPage = new DashboardPage();
-        assertTrue(dashboardPage.moneyTransfer("0001", "0002", 1000));
-        assertTrue(dashboardPage.moneyTransfer("0002", "0001", 2000));
+        var amount = 1000;
+        var cardToBalanceInit = dashboardPage.getСardBalance(cardTo);
+        var cardFromBalanceInit = dashboardPage.getСardBalance(cardFrom);
+
+        var transferPage = new TransferPage();
+        transferPage.moneyTransfer(cardTo, cardFrom, amount);
+
+        var cardToBalanceActual = dashboardPage.getСardBalance(cardTo);
+        var cardFromBalanceActual = dashboardPage.getСardBalance(cardFrom);
+
+        var cardToBalanceExpected = cardToBalanceInit + amount;
+        var cardFromBalanceExpected = cardFromBalanceInit - amount;
+
+        assertEquals(cardFromBalanceActual,cardFromBalanceExpected);
+        assertEquals(cardToBalanceActual,cardToBalanceExpected);
     }
     @Test
     void shouldTransferMoneyZeroAmount() {
@@ -32,34 +46,39 @@ class MoneyTransferTest {
         var verificationPage = loginPage.validLogin(authInfo);
         var verificationCode = DataHelper.getVerificationCodeFor(authInfo);
         verificationPage.validVerify(verificationCode);
-        var dashboardPage = new DashboardPage();
-        assertFalse(dashboardPage.moneyTransfer("0001", "0002", 0));
-        assertFalse(dashboardPage.moneyTransfer("0002", "0001", 0));
+        var transferPage = new TransferPage();
+
+        assertFalse(transferPage.moneyTransfer(cardTo, cardFrom, 0));
     }
     @Test
-    void shouldTransferMoneyBetweenThesameCards() {
+    void shouldTransferMoneyBetweenTheSameCard() {
         open("http://localhost:9999");
         var loginPage = new LoginPageV1();
         var authInfo = DataHelper.getAuthInfo();
         var verificationPage = loginPage.validLogin(authInfo);
         var verificationCode = DataHelper.getVerificationCodeFor(authInfo);
         verificationPage.validVerify(verificationCode);
-        var dashboardPage = new DashboardPage();
-        assertFalse(dashboardPage.moneyTransfer("0001", "0001", 1000));
-        assertFalse(dashboardPage.moneyTransfer("0002", "0002", 1000));
+        var transferPage = new TransferPage();
+
+        assertFalse(transferPage.moneyTransfer(cardTo, cardTo, 1000));
+
     }
 
     @Test
-    void shouldTransferMoneyInsuffientBalance() {
+    void shouldTransferMoneyInsufficientBalance() {
         open("http://localhost:9999");
         var loginPage = new LoginPageV1();
         var authInfo = DataHelper.getAuthInfo();
         var verificationPage = loginPage.validLogin(authInfo);
         var verificationCode = DataHelper.getVerificationCodeFor(authInfo);
         verificationPage.validVerify(verificationCode);
+
         var dashboardPage = new DashboardPage();
-        assertFalse(dashboardPage.moneyTransfer("0001", "0002", 100_000));
-        assertFalse(dashboardPage.moneyTransfer("0002", "0001", 100_000));
+        var cardFromBalanceInit = dashboardPage.getСardBalance(cardFrom);
+
+        var transferPage = new TransferPage();
+        assertFalse(transferPage.moneyTransfer(cardTo, cardFrom, cardFromBalanceInit+100));
+
     }
 }
 
