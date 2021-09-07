@@ -2,7 +2,6 @@ package ru.netology.web.test;
 
 import org.junit.jupiter.api.Test;
 import ru.netology.web.data.DataHelper;
-import ru.netology.web.page.DashboardPage;
 import ru.netology.web.page.LoginPageV1;
 import ru.netology.web.page.TransferPage;
 
@@ -12,16 +11,17 @@ import static org.junit.jupiter.api.Assertions.*;
 class MoneyTransferTest {
     String cardTo = "0001";
     String cardFrom = "0002";
+    String uRL = "http://localhost:9999";
+
     @Test
     void shouldTransferMoneyBetweenOwnCards() {
-        open("http://localhost:9999");
+        open(uRL);
         var loginPage = new LoginPageV1();
         var authInfo = DataHelper.getAuthInfo();
         var verificationPage = loginPage.validLogin(authInfo);
         var verificationCode = DataHelper.getVerificationCodeFor(authInfo);
-        verificationPage.validVerify(verificationCode);
+        var dashboardPage = verificationPage.validVerify(verificationCode);
 
-        var dashboardPage = new DashboardPage();
         var amount = 1000;
         var cardToBalanceInit = dashboardPage.getСardBalance(cardTo);
         var cardFromBalanceInit = dashboardPage.getСardBalance(cardFrom);
@@ -31,54 +31,93 @@ class MoneyTransferTest {
 
         var cardToBalanceActual = dashboardPage.getСardBalance(cardTo);
         var cardFromBalanceActual = dashboardPage.getСardBalance(cardFrom);
-
         var cardToBalanceExpected = cardToBalanceInit + amount;
         var cardFromBalanceExpected = cardFromBalanceInit - amount;
 
-        assertEquals(cardFromBalanceActual,cardFromBalanceExpected);
-        assertEquals(cardToBalanceActual,cardToBalanceExpected);
+        assertEquals(cardToBalanceActual, cardToBalanceExpected);
+        assertEquals(cardFromBalanceActual, cardFromBalanceExpected);
     }
+
     @Test
     void shouldTransferMoneyZeroAmount() {
-        open("http://localhost:9999");
+        open(uRL);
         var loginPage = new LoginPageV1();
         var authInfo = DataHelper.getAuthInfo();
         var verificationPage = loginPage.validLogin(authInfo);
         var verificationCode = DataHelper.getVerificationCodeFor(authInfo);
-        verificationPage.validVerify(verificationCode);
-        var transferPage = new TransferPage();
+        var dashboardPage = verificationPage.validVerify(verificationCode);
 
-        assertFalse(transferPage.moneyTransfer(cardTo, cardFrom, 0));
+        var cardToBalanceInit = dashboardPage.getСardBalance(cardTo);
+        var cardFromBalanceInit = dashboardPage.getСardBalance(cardFrom);
+
+        var transferPage = new TransferPage();
+        transferPage.moneyTransferZeroAmount(cardTo, cardFrom);
+
+        var cardToBalanceActual = dashboardPage.getСardBalance(cardTo);
+        var cardFromBalanceActual = dashboardPage.getСardBalance(cardFrom);
+        var cardToBalanceExpected = cardToBalanceInit;
+        var cardFromBalanceExpected = cardFromBalanceInit;
+
+        assertEquals(cardToBalanceActual, cardToBalanceExpected);
+        assertEquals(cardFromBalanceActual, cardFromBalanceExpected);
     }
+
     @Test
     void shouldTransferMoneyBetweenTheSameCard() {
-        open("http://localhost:9999");
+        open(uRL);
         var loginPage = new LoginPageV1();
         var authInfo = DataHelper.getAuthInfo();
         var verificationPage = loginPage.validLogin(authInfo);
         var verificationCode = DataHelper.getVerificationCodeFor(authInfo);
-        verificationPage.validVerify(verificationCode);
+        var dashboardPage = verificationPage.validVerify(verificationCode);
         var transferPage = new TransferPage();
 
-        assertFalse(transferPage.moneyTransfer(cardTo, cardTo, 1000));
+        var amount = 1000;
+        var cardToBalanceInit = dashboardPage.getСardBalance(cardTo);
+        transferPage.moneyTransferBetweenTheSameCard(cardTo, amount);
+        var cardToBalanceActual = dashboardPage.getСardBalance(cardTo);
+        var cardToBalanceExpected = cardToBalanceInit;
 
+        assertEquals(cardToBalanceActual, cardToBalanceExpected);
     }
 
     @Test
     void shouldTransferMoneyInsufficientBalance() {
-        open("http://localhost:9999");
+        open(uRL);
         var loginPage = new LoginPageV1();
         var authInfo = DataHelper.getAuthInfo();
         var verificationPage = loginPage.validLogin(authInfo);
         var verificationCode = DataHelper.getVerificationCodeFor(authInfo);
-        verificationPage.validVerify(verificationCode);
+        var dashboardPage = verificationPage.validVerify(verificationCode);
 
-        var dashboardPage = new DashboardPage();
+        var amount = 1005;
+        var cardToBalanceInit = dashboardPage.getСardBalance(cardTo);
         var cardFromBalanceInit = dashboardPage.getСardBalance(cardFrom);
 
         var transferPage = new TransferPage();
-        assertFalse(transferPage.moneyTransfer(cardTo, cardFrom, cardFromBalanceInit+100));
+        transferPage.moneyTransferInsufficientBalance(cardTo, cardFrom, cardFromBalanceInit + amount);
 
+        var cardToBalanceActual = dashboardPage.getСardBalance(cardTo);
+        var cardFromBalanceActual = dashboardPage.getСardBalance(cardFrom);
+        var cardToBalanceExpected = cardToBalanceInit; //ничего не должно поменяться
+        var cardFromBalanceExpected = cardFromBalanceInit; //ничего не должно поменяться
+
+        assertEquals(cardToBalanceActual, cardToBalanceExpected);
+        assertEquals(cardFromBalanceActual, cardFromBalanceExpected);
+    }
+
+    @Test
+    void shouldPositiveBalance() {
+        open(uRL);
+        var loginPage = new LoginPageV1();
+        var authInfo = DataHelper.getAuthInfo();
+        var verificationPage = loginPage.validLogin(authInfo);
+        var verificationCode = DataHelper.getVerificationCodeFor(authInfo);
+        var dashboardPage = verificationPage.validVerify(verificationCode);
+
+        var transferPage = new TransferPage();
+        assertTrue(transferPage.isPositiveBalance(cardTo));
+        assertTrue(transferPage.isPositiveBalance(cardFrom));
     }
 }
 
