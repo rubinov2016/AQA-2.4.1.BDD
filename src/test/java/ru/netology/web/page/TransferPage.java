@@ -28,10 +28,4 @@ public class TransferPage {
         $$("button").find(exactText("Пополнить")).click();
         return new DashboardPage();
     }
-//
-//    public boolean isPositiveBalance(String card) {
-//        var dashboardPage = new DashboardPage();
-//        var cardBalance = dashboardPage.getСardBalance(card);
-//        return (cardBalance>=0);
-//    }
 }
