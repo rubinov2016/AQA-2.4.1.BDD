@@ -19,8 +19,6 @@ public class TransferPage {
     }
 
     public DashboardPage moneyTransfer(String cardTo, String cardFrom, int amount) {
-        var dashboardPage = new DashboardPage();
-        var transferPage = dashboardPage.topUp(cardTo);
         ElementsCollection inputs = $$(".input__control");
         inputs.get(0).sendKeys(Keys.CONTROL + "A", Keys.DELETE);
         inputs.get(0).setValue(Integer.toString(amount));
@@ -30,25 +28,10 @@ public class TransferPage {
         $$("button").find(exactText("Пополнить")).click();
         return new DashboardPage();
     }
-
-    public DashboardPage moneyTransferBetweenTheSameCard(String cardTo, int amount) {
-        var dashboardPage = moneyTransfer(cardTo, cardTo, amount);
-        return dashboardPage;
-    }
-
-    public DashboardPage moneyTransferZeroAmount(String cardTo, String cardFrom) {
-        var dashboardPage = moneyTransfer(cardTo, cardFrom, 0);
-        return dashboardPage;
-    }
-
-    public DashboardPage moneyTransferInsufficientBalance(String cardTo, String cardFrom, int amount) {
-        var dashboardPage = moneyTransfer(cardTo, cardFrom, amount);
-        return dashboardPage;
-    }
-
-    public boolean isPositiveBalance(String card) {
-        var dashboardPage = new DashboardPage();
-        var cardBalance = dashboardPage.getСardBalance(card);
-        return (cardBalance>=0);
-    }
+//
+//    public boolean isPositiveBalance(String card) {
+//        var dashboardPage = new DashboardPage();
+//        var cardBalance = dashboardPage.getСardBalance(card);
+//        return (cardBalance>=0);
+//    }
 }

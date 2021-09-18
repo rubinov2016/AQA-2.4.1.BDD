@@ -26,7 +26,7 @@ class MoneyTransferTest {
         var cardToBalanceInit = dashboardPage.getСardBalance(cardTo);
         var cardFromBalanceInit = dashboardPage.getСardBalance(cardFrom);
 
-        var transferPage = new TransferPage();
+        var transferPage = dashboardPage.topUp(cardTo);
         transferPage.moneyTransfer(cardTo, cardFrom, amount);
 
         var cardToBalanceActual = dashboardPage.getСardBalance(cardTo);
@@ -50,8 +50,8 @@ class MoneyTransferTest {
         var cardToBalanceInit = dashboardPage.getСardBalance(cardTo);
         var cardFromBalanceInit = dashboardPage.getСardBalance(cardFrom);
 
-        var transferPage = new TransferPage();
-        transferPage.moneyTransferZeroAmount(cardTo, cardFrom);
+        var transferPage = dashboardPage.topUp(cardTo);
+        transferPage.moneyTransfer(cardTo, cardFrom,0);
 
         var cardToBalanceActual = dashboardPage.getСardBalance(cardTo);
         var cardFromBalanceActual = dashboardPage.getСardBalance(cardFrom);
@@ -70,11 +70,12 @@ class MoneyTransferTest {
         var verificationPage = loginPage.validLogin(authInfo);
         var verificationCode = DataHelper.getVerificationCodeFor(authInfo);
         var dashboardPage = verificationPage.validVerify(verificationCode);
-        var transferPage = new TransferPage();
 
         var amount = 1000;
         var cardToBalanceInit = dashboardPage.getСardBalance(cardTo);
-        transferPage.moneyTransferBetweenTheSameCard(cardTo, amount);
+
+        var transferPage = dashboardPage.topUp(cardTo);
+        transferPage.moneyTransfer(cardTo, cardTo, amount);
         var cardToBalanceActual = dashboardPage.getСardBalance(cardTo);
         var cardToBalanceExpected = cardToBalanceInit;
 
@@ -94,8 +95,8 @@ class MoneyTransferTest {
         var cardToBalanceInit = dashboardPage.getСardBalance(cardTo);
         var cardFromBalanceInit = dashboardPage.getСardBalance(cardFrom);
 
-        var transferPage = new TransferPage();
-        transferPage.moneyTransferInsufficientBalance(cardTo, cardFrom, cardFromBalanceInit + amount);
+        var transferPage = dashboardPage.topUp(cardTo);
+        transferPage.moneyTransfer(cardTo, cardFrom, cardFromBalanceInit + amount);
 
         var cardToBalanceActual = dashboardPage.getСardBalance(cardTo);
         var cardFromBalanceActual = dashboardPage.getСardBalance(cardFrom);
@@ -115,9 +116,7 @@ class MoneyTransferTest {
         var verificationCode = DataHelper.getVerificationCodeFor(authInfo);
         var dashboardPage = verificationPage.validVerify(verificationCode);
 
-        var transferPage = new TransferPage();
-        assertTrue(transferPage.isPositiveBalance(cardTo));
-        assertTrue(transferPage.isPositiveBalance(cardFrom));
+        assertTrue(dashboardPage.getСardBalance(cardTo)>=0);
     }
 }
 
